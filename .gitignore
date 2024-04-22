@@ -1,0 +1,30 @@
+node_modules/
+.expo/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+/.idea
+tmp
+/out-tsc
+
+# macOS
+.DS_Store
+
+# Next.js
+.next
+.anchor
+anchor/target/deploy
+anchor/target/debug
+anchor/target/release
+anchor/target/sbf-solana-solana
+anchor/target/.rustc_info.json
+!anchor/target/idl/*.json
+!anchor/target/types/*.ts
+test-ledger
+.yarn
