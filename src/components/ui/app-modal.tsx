@@ -29,7 +29,7 @@ export function AppModal({
         onDismiss={hide}
         contentContainerStyle={[
           styles.container,
-          { backgroundColor: theme.colors.elevation.level4 },
+          { backgroundColor: "#d9d9d9" },
         ]}
       >
         <View>
@@ -64,20 +64,22 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     borderRadius: 5,
+    backgroundColor: "#333",
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 16, // Adjust spacing as needed
+    marginBottom: 16,
+    textAlign: "center",
   },
   action: {
-    marginTop: 16, // Adjust spacing as needed
+    marginTop: 16,
   },
   buttonGroup: {
     flexDirection: "row",
     justifyContent: "space-around", // Adjust based on your design requirements
   },
   button: {
-    margin: 4, // Adjust as needed
+    margin: 4,
   },
 });

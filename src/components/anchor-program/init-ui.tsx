@@ -1,28 +1,26 @@
 import React, { useCallback, useState } from "react";
 import { Button } from "react-native";
-import { Connection, Transaction } from "@solana/web3.js";
-import { Program } from "@coral-xyz/anchor";
+import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+
 import {
   transact,
   Web3MobileWallet,
 } from "@solana-mobile/mobile-wallet-adapter-protocol-web3js";
-import * as anchor from "@coral-xyz/anchor";
 import { useAuthorization } from "../../utils/useAuthorization";
 import { UseCashAppProgram } from "../../utils/useCashAppProgram";
 import { CashApp } from "../../cash-app-program/types/cash_app";
 import { alertAndLog } from "../../utils/alertAndLog";
+import { Program } from "@coral-xyz/anchor";
 
-type SignIncrementTxProps = Readonly<{
-  anchorWallet: anchor.Wallet;
-}>;
+type signCashApp = Readonly<{ user: PublicKey }>;
 
-export default function InitAccount({ anchorWallet }: SignIncrementTxProps) {
+export default function InitAccount({ user }: signCashApp) {
   const [genInProgress, setGenInProgress] = useState(false);
   const [connection] = useState(
     () => new Connection("https://api.devnet.solana.com")
   );
   const { authorizeSession, selectedAccount } = useAuthorization();
-  const { cashAppProgram, cashAppPDA } = UseCashAppProgram(anchorWallet);
+  const { cashAppProgram, cashAppPDA } = UseCashAppProgram(user);
 
   const signIncrementTransaction = useCallback(
     async (program: Program<CashApp>) => {

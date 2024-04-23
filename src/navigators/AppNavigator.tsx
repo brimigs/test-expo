@@ -13,11 +13,10 @@ import { Appearance, useColorScheme } from "react-native";
 import * as Screens from "../screens";
 import { HomeNavigator } from "./HomeNavigator";
 import { StatusBar } from "expo-status-bar";
-import {
-  MD3DarkTheme,
-  MD3LightTheme,
-  adaptNavigationTheme,
-} from "react-native-paper";
+import { MD3DarkTheme, adaptNavigationTheme } from "react-native-paper";
+import SendScreen from "../screens/SendScreen";
+import ReceiveScreen from "../screens/ReceiveScreen";
+import InputScreen from "../screens/InputScreen";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -32,10 +31,12 @@ import {
  *
  */
 
-type RootStackParamList = {
+export type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
-  // 🔥 Your screens go here
+  Receive: { inputValue: string };
+  Send: { inputValue: string };
+  Input: { inputValue: string };
 };
 
 declare global {
@@ -56,7 +57,21 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Settings" component={Screens.SettingsScreen} />
-      {/** 🔥 Your screens go here */}
+      <Stack.Screen
+        name="Send"
+        component={SendScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Receive"
+        component={ReceiveScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Input"
+        component={InputScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
@@ -65,20 +80,11 @@ export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = (props: NavigationProps) => {
-  const colorScheme = useColorScheme();
-  const { LightTheme, DarkTheme } = adaptNavigationTheme({
+  const { DarkTheme } = adaptNavigationTheme({
     reactNavigationLight: NavigationDefaultTheme,
     reactNavigationDark: NavigationDarkTheme,
   });
 
-  const CombinedDefaultTheme = {
-    ...MD3LightTheme,
-    ...LightTheme,
-    colors: {
-      ...MD3LightTheme.colors,
-      ...LightTheme.colors,
-    },
-  };
   const CombinedDarkTheme = {
     ...MD3DarkTheme,
     ...DarkTheme,
@@ -89,10 +95,7 @@ export const AppNavigator = (props: NavigationProps) => {
   };
 
   return (
-    <NavigationContainer
-      theme={colorScheme === "dark" ? CombinedDarkTheme : CombinedDefaultTheme}
-      {...props}
-    >
+    <NavigationContainer theme={CombinedDarkTheme} {...props}>
       <StatusBar />
       <AppStack />
     </NavigationContainer>

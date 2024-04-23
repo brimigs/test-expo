@@ -1,23 +1,21 @@
-// import { View } from "react-native";
-// import { useTheme } from "react-native-paper";
-// import { useAuthorization } from "../../utils/useAuthorization";
-// import InitAccount from "./init-ui";
-// import { useAnchorWallet } from "../../utils/useAnchorWallet";
+import { View } from "react-native";
+import { useTheme } from "react-native-paper";
+import { useAuthorization } from "../../utils/useAuthorization";
+import InitAccount from "./init-ui";
+export function InitAccountFeature() {
+  const { selectedAccount } = useAuthorization();
+  const user = selectedAccount.publicKey;
 
-// export function InitAccountFeature() {
-//   const { authorizeSession, selectedAccount } = useAuthorization();
-//   const anchorWallet = useAnchorWallet(authorizeSession, selectedAccount);
+  if (!selectedAccount) {
+    return null;
+  }
+  const theme = useTheme();
 
-//   if (!selectedAccount) {
-//     return null;
-//   }
-//   const theme = useTheme();
-
-//   return (
-//     <>
-//       <View style={{ marginTop: 24, alignItems: "center" }}>
-//         <InitAccount anchorWallet={anchorWallet!} />
-//       </View>
-//     </>
-//   );
-// }
+  return (
+    <>
+      <View style={{ marginTop: 24, alignItems: "center" }}>
+        <InitAccount user={user!} />
+      </View>
+    </>
+  );
+}
