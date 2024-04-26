@@ -24,38 +24,53 @@ export default function InitAccount({ user }: signCashApp) {
 
   const signIncrementTransaction = useCallback(
     async (program: Program<CashApp>) => {
-      return await transact(async (wallet: Web3MobileWallet) => {
-        const [authorizationResult, latestBlockhash] = await Promise.all([
-          authorizeSession(wallet),
-          connection.getLatestBlockhash(),
-        ]);
+      let signedTransactions = await transact(
+        async (wallet: Web3MobileWallet) => {
+          const [authorizationResult, latestBlockhash] = await Promise.all([
+            authorizeSession(wallet),
+            connection.getLatestBlockhash(),
+          ]);
 
-        // Generate the increment ix from the Anchor program
-        const incrementInstruction = await program.methods
-          .initializeAccount()
-          .accounts({
-            user: authorizationResult.publicKey,
-            cashAccount: cashAppPDA,
-          })
-          .instruction();
+          // Generate the increment ix from the Anchor program
+          const incrementInstruction = await program.methods
+            .initializeAccount()
+            .accounts({
+              user: authorizationResult.publicKey,
+              cashAccount: cashAppPDA,
+            })
+            .instruction();
 
-        console.log(JSON.stringify(incrementInstruction));
+          const incrementTransaction = new Transaction({
+            ...latestBlockhash,
+            feePayer: authorizationResult.publicKey,
+          }).add(incrementInstruction);
 
-        // Build a transaction containing the instruction
-        const incrementTransaction = new Transaction({
-          ...latestBlockhash,
-          feePayer: authorizationResult.publicKey,
-        }).add(incrementInstruction);
+          // Sign a transaction and receive
+          const signedTransactions = await wallet.signTransactions({
+            transactions: [incrementTransaction],
+          });
 
-        console.log(JSON.stringify(incrementTransaction));
+          return signedTransactions[0];
+        }
+      );
 
-        // Sign a transaction and receive
-        const signedTransactions = await wallet.signAndSendTransactions({
-          transactions: [incrementTransaction],
-        });
+      let txSignature = await connection.sendRawTransaction(
+        signedTransactions.serialize(),
+        {
+          skipPreflight: true,
+        }
+      );
 
-        return signedTransactions[0];
-      });
+      const confirmationResult = await connection.confirmTransaction(
+        txSignature,
+        "confirmed"
+      );
+
+      if (confirmationResult.value.err) {
+        throw new Error(JSON.stringify(confirmationResult.value.err));
+      } else {
+        console.log("Transaction successfully submitted!");
+      }
     },
     [authorizeSession, connection, cashAppPDA]
   );

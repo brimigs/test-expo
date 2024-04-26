@@ -7,7 +7,7 @@ import idl from "../cash-app-program/idl/cash_app.json";
 
 export function UseCashAppProgram(user: PublicKey) {
   const cashAppProgramId = new PublicKey(
-    "BxCbQks4iaRvfCnUzf3utYYG9V53TDwVLxA6GGBnhci4"
+    "4qGa2J7qmkZaXf35pZpLz67vw4JrGjhpHtSsVi9dLvd1"
   );
 
   const [connection] = useState(
