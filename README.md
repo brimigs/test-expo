@@ -94,9 +94,8 @@ Follow the **["Running the app"](https://docs.solanamobile.com/react-native/expo
 
   - This is a [known error](https://github.com/react-native-community/cli/issues/1924) that occurs with certain versions of `yarn` (>= 3.5.0). It is fixed by running the cli command with the `--npm` flag or downgrading your version of `yarn`.
 
-- "error: You don't have the required permissions to perform this operation."
-  replace your app id in the aoo.json with the one that was created in your expor account under projects in expo dashboard: https://expo.dev/accounts/yourname/projects/yourappname
-
+- `error: You don't have the required permissions to perform this operation.`
+  replace your app id in the app.json with the one that was created in your expor account under projects in expo dashboard: https://expo.dev/accounts/yourname/projects/yourappname
   Also make sure to add the correct app name in the app.json file.
 
 # Run locally:
