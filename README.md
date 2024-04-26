@@ -106,9 +106,9 @@ https://docs.solanamobile.com/react-native/expo#running-the-app
 
 Then run the build with
 
-````bash
+```bash
 npx eas build --profile development --platform android --local
-``
+```
 
 Follow the guide here: https://reactnative.dev/docs/environment-setup?package-manager=yarn&guide=native&platform=android
 to add your android sdk to path.
