@@ -19,55 +19,6 @@ export function AccountDetailFeature() {
   const { selectedAccount } = useAuthorization();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const AddCashModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={() => {
-        setModalVisible(!modalVisible);
-      }}
-    >
-      <View style={styles.bottomView}>
-        <View style={styles.modalView}>
-          <Text style={styles.buttonText}>Add Cash</Text>
-          {/* <View style={styles.centeredView}>
-            <TouchableOpacity
-              style={styles.fullWidthButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.currencyText}>
-                {" "}
-                <MaterialCommunityIcon
-                  name="currency-usd"
-                  size={30}
-                  color="white"
-                />
-                US Dollars
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.fullWidthButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.currencyText}>
-                {" "}
-                <MaterialCommunityIcon name="bitcoin" size={30} color="white" />
-                Bitcoin
-              </Text>
-            </TouchableOpacity>
-          </View> */}
-          <TouchableOpacity
-            style={{ position: "absolute", bottom: 25 }}
-            onPress={() => setModalVisible(false)}
-          >
-            <Button title="Add"></Button>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-
   if (!selectedAccount) {
     return null;
   }

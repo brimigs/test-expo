@@ -30,7 +30,11 @@ export function UseCashAppProgram(user: PublicKey) {
   // }, [anchorWallet, connection]);
 
   const cashAppProgram = useMemo(() => {
-    return new Program<CashAppProgram>(idl as CashAppProgram, cashAppProgramId);
+    return new Program<CashAppProgram>(
+      idl as CashAppProgram,
+      cashAppProgramId,
+      { connection }
+    );
   }, [cashAppProgramId]);
 
   const value = useMemo(

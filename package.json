@@ -10,6 +10,7 @@
     "build": "npx eas build --profile development --platform android --local"
   },
   "dependencies": {
+    "@bonfida/spl-name-service": "^2.4.2",
     "@coral-xyz/anchor": "0.28.0",
     "@expo/vector-icons": "^13.0.0",
     "@react-native-async-storage/async-storage": "1.21.0",

@@ -4,8 +4,7 @@ import { TopBar } from "../components/top-bar/top-bar-feature";
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import { DefaultTheme, PaperProvider, useTheme } from "react-native-paper";
 import PayScreen from "../screens/PayScreen";
-import { ScanScreen, HomeScreen } from "../screens";
-
+import { ScanScreen, HomeScreen, ActivityScreen } from "../screens";
 const Tab = createBottomTabNavigator();
 
 /**
@@ -58,6 +57,14 @@ export function HomeNavigator() {
                     color={color}
                   />
                 );
+              case "Activity":
+                return (
+                  <MaterialCommunityIcon
+                    name={focused ? "clock-outline" : "clock-outline"}
+                    size={size}
+                    color={color}
+                  />
+                );
             }
           },
         })}
@@ -65,6 +72,7 @@ export function HomeNavigator() {
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Pay" component={PayScreen} />
         <Tab.Screen name="Scan" component={ScanScreen} />
+        <Tab.Screen name="Activity" component={ActivityScreen} />
       </Tab.Navigator>
     </PaperProvider>
   );

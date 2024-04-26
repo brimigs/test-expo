@@ -1,28 +1,20 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Modal,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 
 import { Section } from "../Section";
 import { useAuthorization } from "../utils/useAuthorization";
 import { AccountDetailFeature } from "../components/account/account-detail-feature";
 import { SignInFeature } from "../components/sign-in/sign-in-feature";
-import { InitAccountFeature } from "../components/anchor-program/int-feature";
-import { SnsFeature } from "../components/sns/sns-feature";
 
-export function HomeScreen() {
+export function ActivityScreen() {
   const { selectedAccount } = useAuthorization();
 
   return (
     <View style={styles.screenContainer}>
       {selectedAccount ? (
         <>
-          <InitAccountFeature />
+          {/* <InitAccountFeature /> */}
           <AccountDetailFeature />
         </>
       ) : (

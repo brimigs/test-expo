@@ -294,7 +294,7 @@ export function PendingPayments({ address }: { address: PublicKey }) {
         <Text
           variant="titleMedium"
           style={{
-            color: "#ccc",
+            color: "white",
           }}
         >
           Pending Payments
