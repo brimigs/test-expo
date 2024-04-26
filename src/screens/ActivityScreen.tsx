@@ -4,8 +4,8 @@ import { Text } from "react-native-paper";
 
 import { Section } from "../Section";
 import { useAuthorization } from "../utils/useAuthorization";
-import { AccountDetailFeature } from "../components/account/account-detail-feature";
 import { SignInFeature } from "../components/sign-in/sign-in-feature";
+import { ActivityFeature } from "../components/account/activity-feature";
 
 export function ActivityScreen() {
   const { selectedAccount } = useAuthorization();
@@ -14,8 +14,8 @@ export function ActivityScreen() {
     <View style={styles.screenContainer}>
       {selectedAccount ? (
         <>
-          {/* <InitAccountFeature /> */}
-          <AccountDetailFeature />
+          <Text style={styles.headerTextLarge}>Your Activity</Text>
+          <ActivityFeature />
         </>
       ) : (
         <>
@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
   },
   headerTextLarge: {
     fontWeight: "bold",
-    marginBottom: 12,
-    marginTop: 12,
+    marginBottom: 25,
+    marginTop: 15,
     textAlign: "center",
     color: "white",
   },
