@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Modal,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 
 import { Section } from "../Section";
@@ -28,7 +22,10 @@ export function HomeScreen() {
       ) : (
         <>
           <Text style={styles.headerTextLarge}>Solana Cash App</Text>
-          <Section description="Sign in with Solana (SIWS) to link your wallet." />
+          <Text style={styles.text}>
+            {" "}
+            Sign in with Solana (SIWS) to link your wallet.
+          </Text>
           <SignInFeature />
         </>
       )}
@@ -54,10 +51,17 @@ const styles = StyleSheet.create({
   },
   headerTextLarge: {
     fontWeight: "bold",
+    marginBottom: 25,
+    marginTop: 25,
+    textAlign: "center",
+    color: "white",
+    fontSize: 20,
+  },
+  text: {
     marginBottom: 12,
     marginTop: 12,
     textAlign: "center",
-    color: "white",
+    color: "#ccc",
   },
   modalView: {
     backgroundColor: "#444",

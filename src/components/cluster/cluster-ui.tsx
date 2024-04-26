@@ -27,5 +27,6 @@ const styles = StyleSheet.create({
   listItem: {
     paddingVertical: 8,
     paddingHorizontal: 16,
+    color: "#ccc",
   },
 });
