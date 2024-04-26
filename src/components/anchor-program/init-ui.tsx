@@ -33,7 +33,10 @@ export default function InitAccount({ user }: signCashApp) {
         // Generate the increment ix from the Anchor program
         const incrementInstruction = await program.methods
           .initializeAccount()
-          .accounts({ cashAccount: cashAppPDA })
+          .accounts({
+            user: authorizationResult.publicKey,
+            cashAccount: cashAppPDA,
+          })
           .instruction();
 
         // Build a transaction containing the instruction

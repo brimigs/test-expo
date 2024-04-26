@@ -32,7 +32,7 @@ This template is a ready-to-go Expo dApp that offers:
 ## Prerequisites
 
 - An [Expo](https://expo.dev/) account.
-- React Native and Android Envrionment [setup](https://docs.solanamobile.com/getting-started/development-setup)
+- React Native and Android Environment [setup](https://docs.solanamobile.com/getting-started/development-setup)
   - An Android device/emulator.
   - Install an MWA compliant wallet app on your device/emulator.
 
@@ -91,4 +91,51 @@ Follow the **["Running the app"](https://docs.solanamobile.com/react-native/expo
 <br>
 
 - `error Couldn't find the ".../@solana-mobile/solana-mobile-dapp-scaffold/template.config.js file inside "@solana-mobile/solana-mobile-dapp-scaffold" template.`
+
   - This is a [known error](https://github.com/react-native-community/cli/issues/1924) that occurs with certain versions of `yarn` (>= 3.5.0). It is fixed by running the cli command with the `--npm` flag or downgrading your version of `yarn`.
+
+- "error: You don't have the required permissions to perform this operation."
+  replace your app id in the aoo.json with the one that was created in your expor account under projects in expo dashboard: https://expo.dev/accounts/yourname/projects/yourappname
+
+  Also make sure to add the correct app name in the app.json file.
+
+# Run locally:
+
+Follow the guide here:
+https://docs.solanamobile.com/react-native/expo#running-the-app
+
+Then run the build with
+
+````bash
+npx eas build --profile development --platform android --local
+``
+
+Follow the guide here: https://reactnative.dev/docs/environment-setup?package-manager=yarn&guide=native&platform=android
+to add your android sdk to path.
+
+Install JDK
+Install Android Studio and Android SDK
+
+Probably need to to these steps:
+
+Add the following lines to your ~/.zprofile or ~/.zshrc (if you are using bash, then ~/.bash_profile or ~/.bashrc) config file:
+
+```bash
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+````
+
+Then use the following command to install the apk:
+
+```bash
+adb install /Users/jonasmac2/Documents/GitHub/test-expo/expoTest/build-1714141154700.apk
+```
+
+Then run the app with:
+
+```bash
+npx expo start --dev-client
+```
+
+then press a to run the app on the connected device or emulator.
