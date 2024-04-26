@@ -15,7 +15,7 @@ import {
 } from "./account-ui";
 import { useState } from "react";
 
-export function AccountDetailFeature() {
+export function ActivityFeature() {
   const { selectedAccount } = useAuthorization();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -27,13 +27,10 @@ export function AccountDetailFeature() {
   return (
     <>
       <View style={styles.cardContainer}>
-        <Text variant="titleMedium" style={styles.headerText}>
-          Cash Balance
-        </Text>
-        <View style={{ alignItems: "center" }}>
-          <AccountBalance address={selectedAccount.publicKey} />
-          <AccountButtonGroup address={selectedAccount.publicKey} />
-        </View>
+        <PendingPayments address={selectedAccount.publicKey} />
+      </View>
+      <View style={styles.cardContainer}>
+        <PendingRequest address={selectedAccount.publicKey} />
       </View>
     </>
   );
