@@ -39,14 +39,18 @@ export default function InitAccount({ user }: signCashApp) {
           })
           .instruction();
 
+        console.log(JSON.stringify(incrementInstruction));
+
         // Build a transaction containing the instruction
         const incrementTransaction = new Transaction({
           ...latestBlockhash,
           feePayer: authorizationResult.publicKey,
         }).add(incrementInstruction);
 
+        console.log(JSON.stringify(incrementTransaction));
+
         // Sign a transaction and receive
-        const signedTransactions = await wallet.signTransactions({
+        const signedTransactions = await wallet.signAndSendTransactions({
           transactions: [incrementTransaction],
         });
 
