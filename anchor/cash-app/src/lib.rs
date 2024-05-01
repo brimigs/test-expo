@@ -3,7 +3,7 @@ use anchor_lang::solana_program::clock::Clock;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
 
-declare_id!("4qGa2J7qmkZaXf35pZpLz67vw4JrGjhpHtSsVi9dLvd1");
+declare_id!("9p2rqGtDj27UL3oNPn8ZKJ56QS16jg1ujWLLxxMfxEwE");
 
 #[program]
 pub mod cash_app {

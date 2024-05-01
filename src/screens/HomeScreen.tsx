@@ -8,6 +8,7 @@ import { AccountDetailFeature } from "../components/account/account-detail-featu
 import { SignInFeature } from "../components/sign-in/sign-in-feature";
 import { InitAccountFeature } from "../components/anchor-program/int-feature";
 import { SnsFeature } from "../components/sns/sns-feature";
+import { DepositFundsFeature } from "../components/anchor-program/deposit-feature";
 
 export function HomeScreen() {
   const { selectedAccount } = useAuthorization();
@@ -16,7 +17,8 @@ export function HomeScreen() {
     <View style={styles.screenContainer}>
       {selectedAccount ? (
         <>
-          <InitAccountFeature />
+          {/* <InitAccountFeature />
+          <DepositFundsFeature /> */}
           <AccountDetailFeature />
         </>
       ) : (

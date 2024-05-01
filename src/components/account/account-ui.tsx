@@ -26,7 +26,7 @@ import { useState, useMemo } from "react";
 import { ellipsify } from "../../utils/ellipsify";
 import { AppModal } from "../ui/app-modal";
 import { DarkTheme } from "@react-navigation/native";
-import { set } from "@coral-xyz/anchor/dist/cjs/utils/features";
+import { DepositFundsFeature } from "../anchor-program/deposit-feature";
 
 function lamportsToSol(balance: number) {
   return Math.round((balance / LAMPORTS_PER_SOL) * 100000) / 100000;
@@ -85,13 +85,14 @@ export function AccountButtonGroup({ address }: { address: PublicKey }) {
               marginTop: 50,
             }}
           />
-          <Button
+          {/* <DepositFundsFeature /> */}
+          {/* <Button
             mode="contained"
             style={styles.modalButton}
             onPress={() => setAddModalVisible(true)}
           >
             Add
-          </Button>
+          </Button> */}
           <TouchableOpacity
             style={{ position: "absolute", bottom: 25 }}
             onPress={() => setAddModalVisible(false)}

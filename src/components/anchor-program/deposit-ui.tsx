@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Button } from "react-native";
+import { Button, View } from "react-native";
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 
 import {
@@ -10,19 +10,22 @@ import { useAuthorization } from "../../utils/useAuthorization";
 import { UseCashAppProgram } from "../../utils/useCashAppProgram";
 import { CashApp } from "../../cash-app-program/types/cash_app";
 import { alertAndLog } from "../../utils/alertAndLog";
-import { Program } from "@coral-xyz/anchor";
+import { BN, Program } from "@coral-xyz/anchor";
+import { TextInput } from "react-native-paper";
 
 type signCashApp = Readonly<{ user: PublicKey }>;
 
-export default function InitAccount({ user }: signCashApp) {
+export default function DepositFunds({ user }: signCashApp) {
   const [genInProgress, setGenInProgress] = useState(false);
+  const [amount, setAmount] = useState(new BN(0));
+
   const [connection] = useState(
     () => new Connection("https://api.devnet.solana.com")
   );
   const { authorizeSession, selectedAccount } = useAuthorization();
   const { cashAppProgram, cashAppPDA } = UseCashAppProgram(user);
 
-  const initAccount = useCallback(
+  const depositFunds = useCallback(
     async (program: Program<CashApp>) => {
       let signedTransactions = await transact(
         async (wallet: Web3MobileWallet) => {
@@ -33,7 +36,7 @@ export default function InitAccount({ user }: signCashApp) {
 
           // Generate the increment ix from the Anchor program
           const incrementInstruction = await program.methods
-            .initializeAccount()
+            .depositFunds(amount)
             .accounts({
               user: authorizationResult.publicKey,
               cashAccount: cashAppPDA,
@@ -76,32 +79,44 @@ export default function InitAccount({ user }: signCashApp) {
   );
 
   return (
-    <Button
-      title="Set up account"
-      disabled={genInProgress}
-      onPress={async () => {
-        if (genInProgress) {
-          return;
-        }
-        setGenInProgress(true);
-        try {
-          if (!cashAppProgram || !selectedAccount) {
-            console.warn(
-              "Program/wallet is not initialized yet. Try connecting a wallet first."
-            );
+    <>
+      <View style={{ padding: 20 }}>
+        <TextInput
+          label="Amount"
+          value={amount}
+          onChangeText={setAmount}
+          keyboardType="numeric"
+          mode="outlined"
+          style={{ marginBottom: 20, backgroundColor: "#f0f0f0" }}
+        />
+      </View>
+      <Button
+        title="Deposit Funds"
+        disabled={genInProgress}
+        onPress={async () => {
+          if (genInProgress) {
             return;
           }
-          const initializeAccount = await initAccount(cashAppProgram);
+          setGenInProgress(true);
+          try {
+            if (!cashAppProgram || !selectedAccount) {
+              console.warn(
+                "Program/wallet is not initialized yet. Try connecting a wallet first."
+              );
+              return;
+            }
+            const deposit = await depositFunds(cashAppProgram);
 
-          alertAndLog(
-            "Account Initalized: ",
-            "See console for logged transaction."
-          );
-          console.log(initializeAccount);
-        } finally {
-          setGenInProgress(false);
-        }
-      }}
-    />
+            alertAndLog(
+              "Account Initalized: ",
+              "See console for logged transaction."
+            );
+            console.log(deposit);
+          } finally {
+            setGenInProgress(false);
+          }
+        }}
+      />
+    </>
   );
 }
