@@ -63,8 +63,8 @@ export function SolanaPayButton({ address }: { address: PublicKey }) {
               <Text style={styles.text2}> Generate a QR Code to display. </Text>
             </View>
           )}
-          <Text style={styles.text}> Brianna Migliacio </Text>
-          <Text style={styles.text3}> Scan to pay $brimigs </Text>
+          <Text style={styles.text}> Scan to Pay </Text>
+          <Text style={styles.text3}> $BRIMIGS </Text>
         </View>
         <SolPayModal
           hide={() => setShowPayModal(false)}
@@ -111,7 +111,7 @@ export function SolPayModal({
 
   return (
     <AppModal
-      title="Pay @brimigs"
+      title="Pay"
       hide={hide}
       show={show}
       submit={handleSubmit}

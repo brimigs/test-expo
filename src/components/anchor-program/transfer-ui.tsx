@@ -1,14 +1,6 @@
 import React, { useCallback, useState } from "react";
-// import { Button } from "react-native-paper";
+import { Button, View } from "react-native";
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
-import {
-  StyleSheet,
-  Button,
-  View,
-  Pressable,
-  TouchableOpacity,
-  Text,
-} from "react-native";
 
 import {
   transact,
@@ -19,18 +11,25 @@ import { UseCashAppProgram } from "../../utils/useCashAppProgram";
 import { CashApp } from "../../cash-app-program/types/cash_app";
 import { alertAndLog } from "../../utils/alertAndLog";
 import { Program } from "@coral-xyz/anchor";
+import { TextInput } from "react-native-paper";
+import * as anchor from "@coral-xyz/anchor";
+import { getDomainKeySync } from "@bonfida/spl-name-service";
 
 type signCashApp = Readonly<{ user: PublicKey }>;
 
-export default function InitAccount({ user }: signCashApp) {
+export default function DepositFunds({ user }: signCashApp) {
   const [genInProgress, setGenInProgress] = useState(false);
+  const [amount, setAmount] = useState(new anchor.BN(0));
+  const [userName, setUserName] = useState(new anchor.BN(0));
+  const newAmount = new anchor.BN(amount * 1000000000);
+
   const [connection] = useState(
     () => new Connection("https://api.devnet.solana.com")
   );
   const { authorizeSession, selectedAccount } = useAuthorization();
   const { cashAppProgram, cashAppPDA } = UseCashAppProgram(user);
 
-  const initAccount = useCallback(
+  const depositFunds = useCallback(
     async (program: Program<CashApp>) => {
       let signedTransactions = await transact(
         async (wallet: Web3MobileWallet) => {
@@ -39,12 +38,14 @@ export default function InitAccount({ user }: signCashApp) {
             connection.getLatestBlockhash(),
           ]);
 
+          const { pubkey } = getDomainKeySync(userName);
+
           // Generate the increment ix from the Anchor program
           const incrementInstruction = await program.methods
-            .initializeAccount()
+            .transferFunds(pubkey, newAmount)
             .accounts({
               user: authorizationResult.publicKey,
-              cashAccount: cashAppPDA,
+              fromCashAccount: cashAppPDA,
             })
             .instruction();
 
@@ -84,12 +85,20 @@ export default function InitAccount({ user }: signCashApp) {
   );
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={[
-          styles.button,
-          genInProgress ? styles.disabled : styles.enabled,
-        ]}
+    <>
+      <View style={{ padding: 20 }}>
+        <TextInput
+          label="Amount"
+          value={amount}
+          onChangeText={setAmount}
+          keyboardType="numeric"
+          mode="outlined"
+          style={{ marginBottom: 20, backgroundColor: "#f0f0f0" }}
+        />
+      </View>
+      <Button
+        title="Deposit Funds"
+        disabled={genInProgress}
         onPress={async () => {
           if (genInProgress) {
             return;
@@ -102,46 +111,18 @@ export default function InitAccount({ user }: signCashApp) {
               );
               return;
             }
-            const initializeAccount = await initAccount(cashAppProgram);
+            const deposit = await depositFunds(cashAppProgram);
 
             alertAndLog(
-              "Account Initialized: ",
+              "Funds deposited into cash account ",
               "See console for logged transaction."
             );
-            console.log(initializeAccount);
+            console.log(deposit);
           } finally {
             setGenInProgress(false);
           }
         }}
-        disabled={genInProgress}
-      >
-        <Text style={styles.text}>Initialize Account</Text>
-      </TouchableOpacity>
-    </View>
+      />
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: "#ccc",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  text: {
-    color: "black",
-    fontSize: 20,
-  },
-  enabled: {
-    opacity: 1,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-});

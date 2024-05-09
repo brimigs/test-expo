@@ -84,11 +84,6 @@ export type CashApp = {
           isSigner: false;
         },
         {
-          name: "toCashAccount";
-          isMut: true;
-          isSigner: false;
-        },
-        {
           name: "systemProgram";
           isMut: false;
           isSigner: false;
@@ -100,6 +95,10 @@ export type CashApp = {
         }
       ];
       args: [
+        {
+          name: "recipientKey";
+          type: "publicKey";
+        },
         {
           name: "amount";
           type: "u64";
@@ -262,11 +261,6 @@ export const IDL: CashApp = {
           isSigner: false,
         },
         {
-          name: "toCashAccount",
-          isMut: true,
-          isSigner: false,
-        },
-        {
           name: "systemProgram",
           isMut: false,
           isSigner: false,
@@ -278,6 +272,10 @@ export const IDL: CashApp = {
         },
       ],
       args: [
+        {
+          name: "recipientKey",
+          type: "publicKey",
+        },
         {
           name: "amount",
           type: "u64",

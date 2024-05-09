@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 
 import { CashApp as CashAppProgram } from "../cash-app-program/types/cash_app";
 import idl from "../cash-app-program/idl/cash_app.json";
+import { useQuery } from "@tanstack/react-query";
+import { useCluster } from "../components/cluster/cluster-data-access";
 
 export function UseCashAppProgram(user: PublicKey) {
   const cashAppProgramId = new PublicKey(
@@ -46,5 +48,14 @@ export function UseCashAppProgram(user: PublicKey) {
     [cashAppProgram, cashAppProgramId, cashAppPDA]
   );
 
-  return value;
+  const friends = useQuery({
+    queryKey: [
+      "cash_account",
+      "fetch",
+      { endpoint: connection.rpcEndpoint, user },
+    ],
+    queryFn: () => cashAppProgram.account.cashAccount.fetch(user),
+  });
+
+  return { value, friends, cashAppProgram, cashAppPDA };
 }

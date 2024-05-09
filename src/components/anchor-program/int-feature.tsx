@@ -13,7 +13,7 @@ export function InitAccountFeature() {
 
   return (
     <>
-      <View style={{ marginTop: 24, alignItems: "center" }}>
+      <View style={{ marginTop: 24, marginBottom: 24, alignItems: "center" }}>
         <InitAccount user={user!} />
       </View>
     </>

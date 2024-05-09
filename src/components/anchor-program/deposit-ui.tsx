@@ -10,14 +10,16 @@ import { useAuthorization } from "../../utils/useAuthorization";
 import { UseCashAppProgram } from "../../utils/useCashAppProgram";
 import { CashApp } from "../../cash-app-program/types/cash_app";
 import { alertAndLog } from "../../utils/alertAndLog";
-import { BN, Program } from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import { TextInput } from "react-native-paper";
+import * as anchor from "@coral-xyz/anchor";
 
 type signCashApp = Readonly<{ user: PublicKey }>;
 
 export default function DepositFunds({ user }: signCashApp) {
   const [genInProgress, setGenInProgress] = useState(false);
-  const [amount, setAmount] = useState(new BN(0));
+  const [amount, setAmount] = useState(new anchor.BN(0));
+  const newAmount = new anchor.BN(amount * 1000000000);
 
   const [connection] = useState(
     () => new Connection("https://api.devnet.solana.com")
@@ -36,7 +38,7 @@ export default function DepositFunds({ user }: signCashApp) {
 
           // Generate the increment ix from the Anchor program
           const incrementInstruction = await program.methods
-            .depositFunds(amount)
+            .depositFunds(newAmount)
             .accounts({
               user: authorizationResult.publicKey,
               cashAccount: cashAppPDA,
@@ -108,7 +110,7 @@ export default function DepositFunds({ user }: signCashApp) {
             const deposit = await depositFunds(cashAppProgram);
 
             alertAndLog(
-              "Account Initalized: ",
+              "Funds deposited into cash account ",
               "See console for logged transaction."
             );
             console.log(deposit);

@@ -17,7 +17,6 @@ import { useState } from "react";
 
 export function AccountDetailFeature() {
   const { selectedAccount } = useAuthorization();
-  const [modalVisible, setModalVisible] = useState(false);
 
   if (!selectedAccount) {
     return null;

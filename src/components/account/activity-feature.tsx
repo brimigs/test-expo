@@ -14,6 +14,7 @@ import {
   PendingRequest,
 } from "./account-ui";
 import { useState } from "react";
+import { AddFriend } from "./add-friend-ui";
 
 export function ActivityFeature() {
   const { selectedAccount } = useAuthorization();
@@ -26,6 +27,9 @@ export function ActivityFeature() {
 
   return (
     <>
+      <View style={styles.cardContainer}>
+        <AddFriend address={selectedAccount.publicKey} />
+      </View>
       <View style={styles.cardContainer}>
         <PendingPayments address={selectedAccount.publicKey} />
       </View>

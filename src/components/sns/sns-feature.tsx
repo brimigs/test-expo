@@ -1,18 +1,20 @@
 import { View, StyleSheet } from "react-native";
-import { SnsButton } from "./sns-ui";
+import { DomainNameButton, SnsButton } from "./sns-ui";
 import { useAuthorization } from "../../utils/useAuthorization";
-import React from "react";
+import React, { useCallback } from "react";
 
 export function SnsFeature() {
   const { selectedAccount } = useAuthorization();
-
   if (!selectedAccount) {
     return null;
   }
   return (
-    <View style={styles.buttonGroup}>
-      <SnsButton address={selectedAccount.publicKey} />
-    </View>
+    <>
+      <DomainNameButton address={selectedAccount.publicKey} />
+      <View style={styles.buttonGroup}>
+        <SnsButton address={selectedAccount.publicKey} />
+      </View>
+    </>
   );
 }
 

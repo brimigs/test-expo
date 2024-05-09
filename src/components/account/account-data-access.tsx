@@ -14,7 +14,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useConnection } from "../../utils/ConnectionProvider";
 import { useMobileWallet } from "../../utils/useMobileWallet";
 
-export function useGetBalance({ address }: { address: PublicKey }) {
+export function useGetBalance(address: PublicKey) {
   const { connection } = useConnection();
 
   return useQuery({

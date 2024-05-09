@@ -1,5 +1,11 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   StyleSheet,
   View,
@@ -14,7 +20,18 @@ import { RootStackParamList } from "../navigators/AppNavigator";
 import { RouteProp } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 // import { getDomainKeySync, NameRegistryState } from "@bonfida/spl-name-service";
-import { useMobileWallet } from "../utils/useMobileWallet";
+import * as anchor from "@coral-xyz/anchor";
+import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+import { useAuthorization } from "../utils/useAuthorization";
+import { UseCashAppProgram } from "../utils/useCashAppProgram";
+import { CashApp } from "../cash-app-program/types/cash_app";
+import { Program } from "@coral-xyz/anchor";
+import {
+  transact,
+  Web3MobileWallet,
+} from "@solana-mobile/mobile-wallet-adapter-protocol-web3js";
+import { getDomainKeySync } from "@bonfida/spl-name-service";
+import { alertAndLog } from "../utils/alertAndLog";
 
 type RequestScreenRouteProp = RouteProp<RootStackParamList, "Receive">;
 type RequestScreenNavigationProp = NativeStackNavigationProp<
@@ -28,20 +45,75 @@ type Props = {
 };
 
 const RequestScreen: React.FC<Props> = ({ route, navigation }) => {
-  const [sns, setSNS] = useState("");
   const [reason, setReason] = useState("");
   const { inputValue } = route.params;
-  const amount = parseFloat(inputValue);
-  //   const { pubkey } = getDomainKeySync(sns);
-  const wallet = useMobileWallet();
   const [purchaseProtection, setPurchaseProtection] = useState(false);
+  const [genInProgress, setGenInProgress] = useState(false);
+  const [userName, setUserName] = useState("");
+  const newAmount = new anchor.BN(inputValue);
 
-  // const handleRequest = (pubkey: PublicKey, amount: BigNumber, reason: string) => {
-  //   const url = encodeURL({ recipient: pubkey, amount, memo: reason });
-  //   const qr = createQR(url, 512, 'transparent');
-  // };
+  const [connection] = useState(
+    () => new Connection("https://api.devnet.solana.com")
+  );
+  const { authorizeSession, selectedAccount } = useAuthorization();
+  const user = selectedAccount.publicKey;
+  const { cashAppProgram, cashAppPDA } = UseCashAppProgram(user);
 
-  // const transferSol = useTransferSol(wallet);
+  const transferFunds = useCallback(
+    async (program: Program<CashApp>) => {
+      let signedTransactions = await transact(
+        async (wallet: Web3MobileWallet) => {
+          const [authorizationResult, latestBlockhash] = await Promise.all([
+            authorizeSession(wallet),
+            connection.getLatestBlockhash(),
+          ]);
+
+          const { pubkey } = getDomainKeySync(userName);
+          console.log(pubkey);
+          console.log(newAmount);
+          // Generate the increment ix from the Anchor program
+          const transferInstruction = await program.methods
+            .transferFunds(pubkey, newAmount)
+            .accounts({
+              user: authorizationResult.publicKey,
+              fromCashAccount: cashAppPDA,
+            })
+            .instruction();
+
+          const transferTransaction = new Transaction({
+            ...latestBlockhash,
+            feePayer: authorizationResult.publicKey,
+          }).add(transferInstruction);
+
+          // Sign a transaction and receive
+          const signedTransactions = await wallet.signTransactions({
+            transactions: [transferTransaction],
+          });
+
+          return signedTransactions[0];
+        }
+      );
+
+      let txSignature = await connection.sendRawTransaction(
+        signedTransactions.serialize(),
+        {
+          skipPreflight: true,
+        }
+      );
+
+      const confirmationResult = await connection.confirmTransaction(
+        txSignature,
+        "confirmed"
+      );
+
+      if (confirmationResult.value.err) {
+        throw new Error(JSON.stringify(confirmationResult.value.err));
+      } else {
+        console.log("Transaction successfully submitted!");
+      }
+    },
+    [authorizeSession, connection, cashAppPDA]
+  );
 
   return (
     <View style={styles.container}>
@@ -52,23 +124,39 @@ const RequestScreen: React.FC<Props> = ({ route, navigation }) => {
         <Text style={styles.title}>${inputValue}</Text>
         <TouchableOpacity
           style={styles.button}
-          // onPress={() => {
-          //   transferSol
-          //   .mutateAsync({
-          //     destination: pubkey,
-          //     amount,
-          //   })
-          // }}
+          onPress={async () => {
+            if (genInProgress) {
+              return;
+            }
+            setGenInProgress(true);
+            try {
+              if (!cashAppProgram || !selectedAccount) {
+                console.warn(
+                  "Program/wallet is not initialized yet. Try connecting a wallet first."
+                );
+                return;
+              }
+              const deposit = await transferFunds(cashAppProgram);
+
+              alertAndLog(
+                "Funds deposited into cash account ",
+                "See console for logged transaction."
+              );
+              console.log(deposit);
+            } finally {
+              setGenInProgress(false);
+            }
+          }}
         >
-          <Text style={styles.buttonText}>Send</Text>
+          <Text style={styles.buttonText}>Pay</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.row}>
         <Text style={styles.label}>To:</Text>
         <TextInput
           style={styles.input}
-          onChangeText={setSNS}
-          value={sns}
+          onChangeText={setUserName}
+          value={userName}
           placeholder="User"
           placeholderTextColor="#999"
         />

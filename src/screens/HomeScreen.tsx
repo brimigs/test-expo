@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
+// import Widget from "@bonfida/sns-widget";
+// import "@bonfida/sns-widget/style.css";
 
 import { Section } from "../Section";
 import { useAuthorization } from "../utils/useAuthorization";
@@ -9,6 +11,7 @@ import { SignInFeature } from "../components/sign-in/sign-in-feature";
 import { InitAccountFeature } from "../components/anchor-program/int-feature";
 import { SnsFeature } from "../components/sns/sns-feature";
 import { DepositFundsFeature } from "../components/anchor-program/deposit-feature";
+import { Connection } from "@solana/web3.js";
 
 export function HomeScreen() {
   const { selectedAccount } = useAuthorization();
@@ -17,8 +20,7 @@ export function HomeScreen() {
     <View style={styles.screenContainer}>
       {selectedAccount ? (
         <>
-          {/* <InitAccountFeature />
-          <DepositFundsFeature /> */}
+          {/* <SnsFeature /> */}
           <AccountDetailFeature />
         </>
       ) : (

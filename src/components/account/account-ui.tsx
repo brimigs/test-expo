@@ -1,4 +1,9 @@
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import {
+  Connection,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Transaction,
+} from "@solana/web3.js";
 import {
   useGetBalance,
   useGetTokenAccountBalance,
@@ -22,18 +27,32 @@ import {
   TextInput,
   MD3DarkTheme,
 } from "react-native-paper";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ellipsify } from "../../utils/ellipsify";
 import { AppModal } from "../ui/app-modal";
 import { DarkTheme } from "@react-navigation/native";
-import { DepositFundsFeature } from "../anchor-program/deposit-feature";
+import * as anchor from "@coral-xyz/anchor";
+import { useAuthorization } from "../../utils/useAuthorization";
+import { Program } from "@coral-xyz/anchor";
+import {
+  transact,
+  Web3MobileWallet,
+} from "@solana-mobile/mobile-wallet-adapter-protocol-web3js";
+import { CashApp } from "../../cash-app-program/types/cash_app";
+import { UseCashAppProgram } from "../../utils/useCashAppProgram";
+import { alertAndLog } from "../../utils/alertAndLog";
+import { InitAccountFeature } from "../anchor-program/int-feature";
+import { publicKey } from "@coral-xyz/anchor/dist/cjs/utils";
+import { getDomainKeySync } from "@bonfida/spl-name-service";
 
 function lamportsToSol(balance: number) {
   return Math.round((balance / LAMPORTS_PER_SOL) * 100000) / 100000;
 }
 
 export function AccountBalance({ address }: { address: PublicKey }) {
-  const query = useGetBalance({ address });
+  const { cashAppPDA } = UseCashAppProgram(address);
+
+  const query = useGetBalance(cashAppPDA);
   const theme = {
     ...MD3DarkTheme,
     ...DarkTheme,
@@ -59,7 +78,126 @@ export function AccountButtonGroup({ address }: { address: PublicKey }) {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [outModalVisible, setOutModalVisible] = useState(false);
-  const [amount, setAmount] = useState("");
+  const [genInProgress, setGenInProgress] = useState(false);
+  const [depositAmount, setDepositAmount] = useState(new anchor.BN(0));
+  const newDepositAmount = new anchor.BN(depositAmount * 1000000000);
+  const [withdrawAmount, setWithdrawAmount] = useState(new anchor.BN(0));
+  const newWithdrawAmount = new anchor.BN(withdrawAmount * 1000000000);
+  const { authorizeSession, selectedAccount } = useAuthorization();
+  const { cashAppProgram, cashAppPDA } = UseCashAppProgram(address);
+  const [userName, setUserName] = useState("");
+
+  const [connection] = useState(
+    () => new Connection("https://api.devnet.solana.com")
+  );
+
+  const transferFunds = useCallback(
+    async (program: Program<CashApp>) => {
+      let signedTransactions = await transact(
+        async (wallet: Web3MobileWallet) => {
+          const [authorizationResult, latestBlockhash] = await Promise.all([
+            authorizeSession(wallet),
+            connection.getLatestBlockhash(),
+          ]);
+
+          const { pubkey } = getDomainKeySync(userName);
+          // Generate the increment ix from the Anchor program
+          const incrementInstruction = await program.methods
+            .transferFunds(pubkey, newDepositAmount)
+            .accounts({
+              user: authorizationResult.publicKey,
+              fromCashAccount: cashAppPDA,
+            })
+            .instruction();
+
+          const incrementTransaction = new Transaction({
+            ...latestBlockhash,
+            feePayer: authorizationResult.publicKey,
+          }).add(incrementInstruction);
+
+          // Sign a transaction and receive
+          const signedTransactions = await wallet.signTransactions({
+            transactions: [incrementTransaction],
+          });
+
+          return signedTransactions[0];
+        }
+      );
+
+      let txSignature = await connection.sendRawTransaction(
+        signedTransactions.serialize(),
+        {
+          skipPreflight: true,
+        }
+      );
+
+      const confirmationResult = await connection.confirmTransaction(
+        txSignature,
+        "confirmed"
+      );
+
+      if (confirmationResult.value.err) {
+        throw new Error(JSON.stringify(confirmationResult.value.err));
+      } else {
+        console.log("Transaction successfully submitted!");
+      }
+    },
+    [authorizeSession, connection, cashAppPDA]
+  );
+
+  const withdrawFunds = useCallback(
+    async (program: Program<CashApp>) => {
+      let signedTransactions = await transact(
+        async (wallet: Web3MobileWallet) => {
+          const [authorizationResult, latestBlockhash] = await Promise.all([
+            authorizeSession(wallet),
+            connection.getLatestBlockhash(),
+          ]);
+
+          // Generate the increment ix from the Anchor program
+          const incrementInstruction = await program.methods
+            .withdrawFunds(newWithdrawAmount)
+            .accounts({
+              user: authorizationResult.publicKey,
+              cashAccount: cashAppPDA,
+            })
+            .instruction();
+
+          const incrementTransaction = new Transaction({
+            ...latestBlockhash,
+            feePayer: authorizationResult.publicKey,
+          }).add(incrementInstruction);
+
+          // Sign a transaction and receive
+          const signedTransactions = await wallet.signTransactions({
+            transactions: [incrementTransaction],
+          });
+
+          return signedTransactions[0];
+        }
+      );
+
+      let txSignature = await connection.sendRawTransaction(
+        signedTransactions.serialize(),
+        {
+          skipPreflight: true,
+        }
+      );
+
+      const confirmationResult = await connection.confirmTransaction(
+        txSignature,
+        "confirmed"
+      );
+
+      if (confirmationResult.value.err) {
+        throw new Error(JSON.stringify(confirmationResult.value.err));
+      } else {
+        console.log("Transaction successfully submitted!");
+      }
+    },
+    [authorizeSession, connection, cashAppPDA]
+  );
+
   const AddCashModal = () => (
     <Modal
       animationType="slide"
@@ -74,25 +212,60 @@ export function AccountButtonGroup({ address }: { address: PublicKey }) {
           <Text style={styles.buttonText}>Add Cash</Text>
           <TextInput
             label="Amount"
-            value={amount}
-            onChangeText={setAmount}
+            value={depositAmount}
+            onChangeText={setDepositAmount}
             keyboardType="numeric"
             mode="outlined"
             style={{
-              marginBottom: 20,
+              marginBottom: 10,
               backgroundColor: "#ccc",
               width: "80%",
-              marginTop: 50,
+              marginTop: 10,
             }}
           />
-          {/* <DepositFundsFeature /> */}
-          {/* <Button
+          <TextInput
+            label="Name"
+            value={userName}
+            onChangeText={setUserName}
+            keyboardType="default"
+            mode="outlined"
+            style={{
+              marginBottom: 10,
+              backgroundColor: "#ccc",
+              width: "80%",
+              marginTop: 10,
+            }}
+          />
+          <Button
             mode="contained"
             style={styles.modalButton}
-            onPress={() => setAddModalVisible(true)}
+            onPress={async () => {
+              setAddModalVisible(!addModalVisible);
+              if (genInProgress) {
+                return;
+              }
+              setGenInProgress(true);
+              try {
+                if (!cashAppProgram || !selectedAccount) {
+                  console.warn(
+                    "Program/wallet is not initialized yet. Try connecting a wallet first."
+                  );
+                  return;
+                }
+                const deposit = await transferFunds(cashAppProgram);
+
+                alertAndLog(
+                  "Funds deposited into cash account ",
+                  "See console for logged transaction."
+                );
+                console.log(deposit);
+              } finally {
+                setGenInProgress(false);
+              }
+            }}
           >
             Add
-          </Button> */}
+          </Button>
           <TouchableOpacity
             style={{ position: "absolute", bottom: 25 }}
             onPress={() => setAddModalVisible(false)}
@@ -118,8 +291,8 @@ export function AccountButtonGroup({ address }: { address: PublicKey }) {
           <Text style={styles.buttonText}>Cash Out</Text>
           <TextInput
             label="Amount"
-            value={amount}
-            onChangeText={setAmount}
+            value={withdrawAmount}
+            onChangeText={setWithdrawAmount}
             keyboardType="numeric"
             mode="outlined"
             style={{
@@ -132,9 +305,32 @@ export function AccountButtonGroup({ address }: { address: PublicKey }) {
           <Button
             mode="contained"
             style={styles.modalButton}
-            onPress={() => setOutModalVisible(true)}
+            onPress={async () => {
+              setOutModalVisible(!outModalVisible);
+              if (genInProgress) {
+                return;
+              }
+              setGenInProgress(true);
+              try {
+                if (!cashAppProgram || !selectedAccount) {
+                  console.warn(
+                    "Program/wallet is not initialized yet. Try connecting a wallet first."
+                  );
+                  return;
+                }
+                const deposit = await withdrawFunds(cashAppProgram);
+
+                alertAndLog(
+                  "Funds withdrawn from cash account ",
+                  "See console for logged transaction."
+                );
+                console.log(deposit);
+              } finally {
+                setGenInProgress(false);
+              }
+            }}
           >
-            Withdrawal
+            Withdraw
           </Button>
           <TouchableOpacity
             style={{ position: "absolute", bottom: 25 }}
