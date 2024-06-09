@@ -618,38 +618,51 @@ export function PendingRequest({ address }: { address: PublicKey }) {
           <>
             <DataTable>
               <DataTable.Header>
-                <DataTable.Title>To</DataTable.Title>
-                <DataTable.Title>Memo</DataTable.Title>
-                <DataTable.Title numeric>Amount</DataTable.Title>
+                <DataTable.Title textStyle={{ color: "white" }}>
+                  To
+                </DataTable.Title>
+                {/* <DataTable.Title textStyle={{ color: "white" }}>
+                  Memo
+                </DataTable.Title> */}
+                <DataTable.Title textStyle={{ color: "white" }} numeric>
+                  Amount
+                </DataTable.Title>
               </DataTable.Header>
 
-              {query.data.length === 0 && (
+              {/* {query.data.length === 0 && (
                 <View style={{ marginTop: 12 }}>
-                  <Text variant="bodyMedium">No pending payments.</Text>
+                  <Text
+                    style={{
+                      color: "white",
+                    }}
+                  >
+                    No pending payments.
+                  </Text>
                 </View>
-              )}
+              )} */}
 
-              {query.data.map(({ account, pubkey }) => (
-                <TouchableHighlight
-                  key={pubkey.toString()}
-                  onPress={() => {
-                    setShowModal(true);
-                  }}
-                  underlayColor="#DDDDDD" // Light grey color for touch feedback
-                >
-                  <DataTable.Row>
-                    <DataTable.Cell>
-                      {ellipsify(pubkey.toString())}
-                    </DataTable.Cell>
-                    <DataTable.Cell>
-                      {ellipsify(account.data.parsed.info.mint)}
-                    </DataTable.Cell>
-                    <DataTable.Cell numeric>
-                      <AccountTokenBalance address={pubkey} />
-                    </DataTable.Cell>
-                  </DataTable.Row>
-                </TouchableHighlight>
-              ))}
+              {/* {query.data.map(({ account, pubkey }) => ( */}
+              <TouchableHighlight
+                key={"test"}
+                onPress={() => {
+                  setShowModal(true);
+                }}
+                underlayColor="#DDDDDD" // Light grey color for touch feedback
+              >
+                <DataTable.Row>
+                  <DataTable.Cell textStyle={{ color: "white" }}>
+                    {ellipsify("H51gvSJ11enukDJn3Zj1TmcpzNCRFTgHTesGsUXiHmc5")}
+                  </DataTable.Cell>
+                  {/* <DataTable.Cell textStyle={{ color: "white" }}>
+                    {ellipsify("test")}
+                  </DataTable.Cell> */}
+                  <DataTable.Cell textStyle={{ color: "white" }} numeric>
+                    {/* <AccountTokenBalance address={pubkey} /> */}
+                    {5}
+                  </DataTable.Cell>
+                </DataTable.Row>
+              </TouchableHighlight>
+              {/* ))} */}
             </DataTable>
           </>
         )}

@@ -2,10 +2,8 @@ import { Program } from "@coral-xyz/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { useMemo, useState } from "react";
 
-import { CashApp as CashAppProgram } from "../cash-app-program/types/cash_app";
-import idl from "../cash-app-program/idl/cash_app.json";
+import { CashApp, IDL } from "../cash-app-program/types/cash_app";
 import { useQuery } from "@tanstack/react-query";
-import { useCluster } from "../components/cluster/cluster-data-access";
 
 export function UseCashAppProgram(user: PublicKey) {
   const cashAppProgramId = new PublicKey(
@@ -32,11 +30,7 @@ export function UseCashAppProgram(user: PublicKey) {
   // }, [anchorWallet, connection]);
 
   const cashAppProgram = useMemo(() => {
-    return new Program<CashAppProgram>(
-      idl as CashAppProgram,
-      cashAppProgramId,
-      { connection }
-    );
+    return new Program<CashApp>(IDL, cashAppProgramId, { connection });
   }, [cashAppProgramId]);
 
   const value = useMemo(

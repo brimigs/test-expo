@@ -30,9 +30,9 @@ export function ActivityFeature() {
       <View style={styles.cardContainer}>
         <AddFriend address={selectedAccount.publicKey} />
       </View>
-      <View style={styles.cardContainer}>
+      {/* <View style={styles.cardContainer}>
         <PendingPayments address={selectedAccount.publicKey} />
-      </View>
+      </View> */}
       <View style={styles.cardContainer}>
         <PendingRequest address={selectedAccount.publicKey} />
       </View>

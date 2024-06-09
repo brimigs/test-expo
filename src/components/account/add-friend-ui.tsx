@@ -146,7 +146,7 @@ export function AddFriend({ address }: { address: PublicKey }) {
           Add
         </Button>
       </View>
-      <Button
+      {/* <Button
         mode="contained"
         disabled={signingInProgress}
         onPress={async () => {
@@ -154,7 +154,7 @@ export function AddFriend({ address }: { address: PublicKey }) {
         }}
       >
         Refresh
-      </Button>
+      </Button> */}
       <Text
         variant="titleMedium"
         style={{
